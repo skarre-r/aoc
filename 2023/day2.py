@@ -1,7 +1,7 @@
 """
 Part 1:
 Figure out which games (lines) are valid.
-A game is valid as longs as none of the red/ green/ value values exceed their max.
+A game is valid as long as none of the red/ green/ values exceed their max.
 The answer is the sum of all the valid game IDs.
 
 Part 2:
