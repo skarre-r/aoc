@@ -5,52 +5,33 @@ A game is valid as long as none of the red/ green/ values exceed their max.
 The answer is the sum of all the valid game IDs.
 
 Part 2:
-...
+In each game, find the highest red/ green/ blue values and multiply them together.
+The answer is the sum of all those values..
 """
 
 from __future__ import annotations
 
-from typing import TypedDict, Final, TypeAlias
+from typing import Final, TypeAlias
 
 MAX_RED: Final[int] = 12
 MAX_GREEN: Final[int] = 13
 MAX_BLUE: Final[int] = 14
 
-
-class Play(TypedDict):
-    red: int
-    green: int
-    blue: int
-
-
+Play: TypeAlias = dict[str, int]
 Game: TypeAlias = list[Play]
 
 
-# TODO handle double digit values
 def process_input() -> list[Game]:
-    """I dislike working with strings."""
     with open(file="day2.txt", mode="r", newline="\n") as input_file:
-        lines: list[str] = [line for input_file_line in input_file.readlines() if (line := input_file_line.strip())]
-    games: list[list[Play]] = []
-
-    # TODO improve
+        lines: list[str] = [x for y in input_file.readlines() if (x := y.strip())]
+    games: list[Game] = []
     for line in lines:
-        _, all_plays = line.split(":")  # type: str, str
-        processed_plays: list[Play] = []
-        for individual_play in [y for x in all_plays.split(";") if (y := x.strip())]:
-            processed_play: Play = {
-                "red": 0,
-                "green": 0,
-                "blue": 0
-            }
-            for color_value in [x for y in individual_play.split(",") if (x := y.strip())]:
-                value: int = int(color_value[0])
-                for key in processed_play.keys():
-                    if key in color_value:
-                        processed_play[key] = value
-                        break
-            processed_plays.append(processed_play)
-        games.append(processed_plays)
+        game: Game = []
+        for cubes in [x for y in (line.split(":")[1]).split(";") if (x := y.strip())]:
+            game.append(
+                {value[1]: int(value[0]) for value in [cube.strip().split(" ") for cube in cubes.split(",")] if value}
+            )
+        games.append(game)
     return games
 
 
@@ -58,17 +39,22 @@ def solve_part_1(games: list[Game]) -> int:
     valid_game_ids: list[int] = []
     for index, game in enumerate(games):
         if not (
-                any([play["red"] > MAX_RED for play in game])
-                and any([play["green"] > MAX_GREEN for play in game])
-                and any([play["blue"] > MAX_BLUE for play in game])
+                any([play["red"] > MAX_RED for play in game if "red" in play])
+                or any([play["green"] > MAX_GREEN for play in game if "green" in play])
+                or any([play["blue"] > MAX_BLUE for play in game if "blue" in play])
         ):
             valid_game_ids.append((index + 1))
-
     return sum(valid_game_ids)
 
 
 def solve_part_2(games: list[Game]) -> int:
-    ...
+    rgb_power: list[int] = []
+    for game in games:
+        red: int = max([play.get("red", 0) for play in game])
+        green: int = max([play.get("green", 0) for play in game])
+        blue: int = max([play.get("blue", 0) for play in game])
+        rgb_power.append(red * green * blue)
+    return sum(rgb_power)
 
 
 def main():
